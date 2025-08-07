@@ -1,0 +1,31 @@
+name: rtd
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - r-base[version='>=4.2']
+  - r-devtools
+  - python=3.9
+  - cudatoolkit=11.7
+  - numpy=1.21.6
+  - matplotlib=3.6.*
+  - chardet
+  - charset-normalizer
+  - zarr
+  - pip>=22.3,<=23.2
+  - pip:
+      - -r requirements.txt
+      - torch-scatter==2.1.1+cu117    --find-links https://data.pyg.org/whl/torch-1.13.0+cu117.html
+      - torch-sparse==0.6.13+cu117     --find-links https://data.pyg.org/whl/torch-1.13.0+cu117.html
+      - torch-cluster==1.6.0+cu117     --find-links https://data.pyg.org/whl/torch-1.13.0+cu117.html
+      - torch-spline-conv==1.2.1+cu117 --find-links https://data.pyg.org/whl/torch-1.13.0+cu117.html
+      - torch-geometric
+      - gseapy==1.1.8
+      - sphinx
+      - sphinx_rtd_theme
+      - orbax<0.1.8
+      - ipykernel
+      - nbsphinx
+      - nbsphinx-link
+      - myst_nb
+      - entmax
