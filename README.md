@@ -1,6 +1,6 @@
 # Fine-tune scGPT for scRNA-seq integration
 
-Please see our example code in [tutorials/scgpt_finetune.ipynb](tutorials/scgpt_finetune.ipynb). By default, the script assumes the scGPT checkpoint folder stored in the `examples/save` directory.
+Please see our example code in [tutorials/scgpt_finetune.ipynb](tutorials/scgpt_finetune.ipynb). By default, the script assumes the scGPT checkpoint folder stored in the `save` directory.
 
 ## Acknowledgements
 
