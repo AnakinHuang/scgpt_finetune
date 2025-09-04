@@ -1,4 +1,4 @@
-name: rtd
+name: scgpt_finetune
 channels:
   - conda-forge
   - defaults
@@ -15,10 +15,10 @@ dependencies:
   - pip>=22.3,<=23.2
   - pip:
       - -r requirements.txt
-      - torch-scatter==2.1.1+cu117    --find-links https://data.pyg.org/whl/torch-1.13.0+cu117.html
-      - torch-sparse==0.6.13+cu117     --find-links https://data.pyg.org/whl/torch-1.13.0+cu117.html
-      - torch-cluster==1.6.0+cu117     --find-links https://data.pyg.org/whl/torch-1.13.0+cu117.html
-      - torch-spline-conv==1.2.1+cu117 --find-links https://data.pyg.org/whl/torch-1.13.0+cu117.html
+      - torch-scatter==2.1.1 -f https://data.pyg.org/whl/torch-1.13.0+cu117.html
+      - torch-sparse==0.6.13 -f https://data.pyg.org/whl/torch-1.13.0+cu117.html
+      - torch-cluster==1.6.0 -f https://data.pyg.org/whl/torch-1.13.0+cu117.html
+      - torch-spline-conv==1.2.1 -f https://data.pyg.org/whl/torch-1.13.0+cu117.html
       - torch-geometric
       - gseapy==1.1.8
       - sphinx
