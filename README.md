@@ -13,7 +13,8 @@ cd path_to/scGPT
 conda env create -f docs/environment.yml
 conda activate scgpt_finetune
 
-pip install -r requirements.txt
+pip install -r requirements_1.txt
+pip install -r requirements_2.txt
 pip install scgpt "flash-attn<1.0.5"
 pip install wandb
 
