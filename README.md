@@ -13,8 +13,8 @@ cd path_to/scGPT
 conda env create -f docs/environment.yml
 conda activate scgpt_finetune
 
-pip install -r requirements_1.txt
-pip install -r requirements_2.txt
+pip install -r docs/requirements_1.txt
+pip install -r docs/requirements_2.txt
 pip install scgpt "flash-attn<1.0.5"
 pip install wandb
 
@@ -45,4 +45,5 @@ journal={bioRxiv},
 year={2023},
 publisher={Cold Spring Harbor Laboratory}
 }
-```
+
+python -m ipykernel install --prefix=$CONDA_PREFIX --name scgpt_finetune --display-name "Python (scgpt_finetune)"
