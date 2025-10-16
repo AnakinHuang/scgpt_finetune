@@ -5,17 +5,18 @@ Please see our example code in [tutorials/scgpt_finetune.ipynb](tutorials/scgpt_
 ## How to install
 
 ```bash
-module load Anaconda3/2024.02-1 CUDA/11.7.0 cuDNN/8.5.0.96-CUDA-11.7.0
+
 
 git clone https://github.com/bowang-lab/scGPT.git
 cd path_to/scGPT
 
-conda env create -f docs/environment.yml
-conda activate scgpt_finetune
+conda env create -f docs/environment_cu124.yml
+conda activate scgpt_cu124
 
-pip install -r docs/requirements_1.txt
-pip install -r docs/requirements_2.txt
-pip install scgpt "flash-attn<1.0.5"
+pip install -r docs/requirements_1_cu124.txt
+pip install -r docs/requirements_2_cu124.txt
+pip install -e .
+pip install flash_attn
 pip install wandb
 
 python -m ipykernel install \

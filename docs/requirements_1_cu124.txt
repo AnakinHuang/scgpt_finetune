@@ -1,0 +1,40 @@
+# ---- scverse core ----
+anndata~=0.12.2
+scanpy~=1.10.2
+scvi-tools~=1.4.0
+scib~=1.1.7
+
+# ---- numerics / ML ----
+numpy~=1.26.4
+scipy~=1.14.1
+scikit-learn~=1.6.1
+numba~=0.62.1
+llvmlite~=0.45.1
+
+# ---- graph / clustering ----
+networkx~=3.5
+leidenalg~=0.10.2
+umap-learn~=0.5.9.post2
+
+# ---- data / NLP glue ----
+pandas~=2.2.3
+pyarrow~=16.1.0
+datasets~=3.1.0
+transformers~=4.44.2
+tqdm~=4.66.5
+typing-extensions~=4.15.0
+
+# ---- docs / notebooks ----
+gseapy
+sphinx
+sphinx_rtd_theme
+jupyterlab
+notebook
+ipykernel
+nbsphinx
+nbsphinx-link
+myst_nb
+entmax
+
+# ---- optional: JAX / Flax checkpointing ----
+orbax~=0.1.9

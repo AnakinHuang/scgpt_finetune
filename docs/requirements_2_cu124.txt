@@ -1,0 +1,6 @@
+ninja~=1.13.0
+torch-scatter -f https://data.pyg.org/whl/torch-2.5.1+cu124.html
+torch-sparse -f https://data.pyg.org/whl/torch-2.5.1+cu124.html
+torch-cluster -f https://data.pyg.org/whl/torch-2.5.1+cu124.html
+torch-spline-conv -f https://data.pyg.org/whl/torch-2.5.1+cu124.html
+torch-geometric -f https://data.pyg.org/whl/torch-2.5.1+cu124.html
