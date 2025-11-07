@@ -1,13 +1,12 @@
 import os, glob, sys, time, gc
 
 # — os, glob, sys: file‐ and path‐handling; time for measuring durations.
-# — glob for matching “*-annotated_matrix.txt” files.
+# — glob for matching “*-annotated_matrix.*” files.
 
 sys.path.insert(0, "../")
 # — so Python can import your local scGPT repo and build_index script.
 
 os.environ["KMP_WARNINGS"] = "off"
-os.environ["WANDB_NOTEBOOK_NAME"] = "scgpt_finetune.ipynb"
 
 import warnings
 
@@ -69,7 +68,7 @@ from torchtext.vocab import Vocab
 from torchtext._torchtext import Vocab as VocabPybind
 
 
-def raw_data2h5ad(input_dir: str, dataset_name: str, pattern: str, first_n: int):
+def raw_data2h5ad(input_dir: str, output_dir: str, dataset_name: str, pattern: str, first_n: int):
     pattern = os.path.join(input_dir, pattern)
 
     num_txt = 0
@@ -206,10 +205,11 @@ def reference_mapping(output_dir: str,
 def annotation(output_dir: str,
                dataset_name: str,
                filename: str,
-               embed_dataset: AnnData,
+               embed_dataset: AnnData = None,
                embed_filename: str = None,
                filter_gene_by_counts: Union[int, bool] = False,
                filter_cell_by_counts: Union[int, bool] = False,
+               data_is_raw=True,
                seed=0,
                do_train=True,
                load_model="../save/scGPT_human",
@@ -1515,368 +1515,575 @@ def annotation(output_dir: str,
     wandb.finish()
 
 
-if __name__ == '__main__':
-    gc.collect()
-    torch.cuda.synchronize()
-    torch.cuda.empty_cache()
+# if __name__ == '__main__':
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     input_dir = "../data/snrna_expr_matrices/LIBD"
+#     output_dir = input_dir
+#
+#     model_dir = "../save/scGPT_human"
+#     gene_col = "gene_name"
+#     cell_type_key = "celltype"
+#
+#     filter_gene_by_counts = False  # 3
+#     data_is_raw = True
+#
+#     raw_data2h5ad(input_dir, dataset_name="LIBD", pattern="*-annotated_matrix.*", first_n=10)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     embed_adata = reference_mapping(output_dir,
+#                                     model_dir=model_dir,
+#                                     faiss_index_dir="../save/CellXGene_faiss_index",
+#                                     dataset_name="LIBD",
+#                                     filename="LIBD.h5ad",
+#                                     filter_gene_by_counts=filter_gene_by_counts,
+#                                     filter_cell_by_counts=False,
+#                                     data_is_raw=data_is_raw,
+#                                     gene_col=gene_col,
+#                                     cell_type_key=cell_type_key)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                # epochs=15,
+#                lr=1e-4,
+#                freeze=True,
+#                n_unfreeze=-1,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                freeze=True,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                freeze=False,
+#                n_unfreeze=-1,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                freeze=False,
+#                n_unfreeze=2,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                freeze=False,
+#                n_unfreeze=4,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                freeze=True,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                freeze=False,
+#                n_unfreeze=-1,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                freeze=False,
+#                n_unfreeze=2,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                freeze=False,
+#                n_unfreeze=4,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=1,
+#                filter_cell_by_counts=False,
+#                freeze=True,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=1,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=-1,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=1,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=2,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=1,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=4,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=1,
+#                filter_cell_by_counts=False,
+#                freeze=True,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=1,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=-1,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=1,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=2,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=1,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=4,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=3,
+#                filter_cell_by_counts=False,
+#                freeze=True,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=3,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=-1,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=3,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=2,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=3,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=4,
+#                use_moe=False)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=3,
+#                filter_cell_by_counts=False,
+#                freeze=True,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=3,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=-1,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=3,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=2,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
+#
+#     annotation(output_dir,
+#                dataset_name="LIBD",
+#                filename="LIBD.h5ad",
+#                embed_dataset=embed_adata,
+#                filter_gene_by_counts=3,
+#                filter_cell_by_counts=False,
+#                freeze=False,
+#                n_unfreeze=4,
+#                use_moe=True)
+#
+#     gc.collect()
+#     torch.cuda.synchronize()
+#     torch.cuda.empty_cache()
 
-    input_dir = "../data/snrna_expr_matrices/LIBD"
-    output_dir = input_dir
+# ===== CLICK CLI =====
+import click, json, itertools
+from dataclasses import dataclass
 
-    model_dir = "../save/scGPT_human"
-    gene_col = "gene_name"
-    cell_type_key = "celltype"
+def _maybe_bool(x):
+    if isinstance(x, bool): return x
+    s = str(x).lower()
+    if s in ("1","true","t","yes","y"): return True
+    if s in ("0","false","f","no","n"): return False
+    return x
 
-    filter_gene_by_counts = False  # 3
-    data_is_raw = True
+@dataclass
+class AnnotArgs:
+    input_dir: str
+    output_dir: str
+    dataset_name: str
+    filename: str
+    epochs: int
+    lr: float
+    freeze: bool
+    n_unfreeze: int
+    use_moe: bool
+    filter_gene_by_counts: bool
+    filter_cell_by_counts: bool
+    data_is_raw: bool
+    gene_col: str
+    cell_type_key: str
+    model_dir: str
+    faiss_index_dir: str
 
-    # raw_data2h5ad(input_dir, dataset_name="LIBD", pattern="*-annotated_matrix.*", first_n=3)
+def cli():
+    """scGPT utilities: raw->h5ad, reference mapping, and annotation (fine-tune)."""
+    pass
 
-    gc.collect()
-    torch.cuda.synchronize()
-    torch.cuda.empty_cache()
+@cli.command("raw2h5ad")
+@click.option("--input-dir", required=True, type=click.Path(exists=True))
+@click.option("--output-dir", required=True, type=click.Path())
+@click.option("--dataset-name", required=True, type=str)
+@click.option("--pattern", default="*-annotated_matrix.*", show_default=True)
+@click.option("--first-n", default=3, show_default=True, type=int)
+def raw2h5ad_cmd(input_dir, output_dir, dataset_name, pattern, first_n):
+    """Convert raw LIBD/BrainScope matrices to a single .h5ad."""
+    os.makedirs(output_dir, exist_ok=True)
+    raw_data2h5ad(input_dir, output_dir, dataset_name=dataset_name, pattern=pattern, first_n=first_n)
 
-    embed_adata = reference_mapping(output_dir,
-                                    model_dir=model_dir,
-                                    faiss_index_dir="../save/CellXGene_faiss_index",
-                                    dataset_name="LIBD",
-                                    filename="LIBD.h5ad",
-                                    filter_gene_by_counts=filter_gene_by_counts,
-                                    filter_cell_by_counts=False,
-                                    data_is_raw=data_is_raw,
-                                    gene_col=gene_col,
-                                    cell_type_key=cell_type_key)
+@cli.command("reference-mapping")
+@click.option("--output-dir", required=True, type=click.Path())
+@click.option("--model-dir", required=True, type=click.Path(exists=True))
+@click.option("--faiss-index-dir", required=True, type=click.Path(exists=True))
+@click.option("--dataset-name", default="LIBD", show_default=True)
+@click.option("--filename", default="LIBD.h5ad", show_default=True)
+@click.option("--filter-gene-by-counts", default=False, type=bool, show_default=True)
+@click.option("--filter-cell-by-counts", default=False, type=bool, show_default=True)
+@click.option("--data-is-raw", default=True, type=bool, show_default=True)
+@click.option("--gene-col", default="gene_name", show_default=True)
+@click.option("--cell-type-key", default="celltype", show_default=True)
+def refmap_cmd(output_dir, model_dir, faiss_index_dir, dataset_name, filename,
+               filter_gene_by_counts, filter_cell_by_counts, data_is_raw, gene_col, cell_type_key):
+    """Run scGPT reference mapping and return an AnnData with embeddings."""
+    reference_mapping(
+        output_dir=output_dir,
+        model_dir=model_dir,
+        faiss_index_dir=faiss_index_dir,
+        dataset_name=dataset_name,
+        filename=filename,
+        filter_gene_by_counts=filter_gene_by_counts,
+        filter_cell_by_counts=filter_cell_by_counts,
+        data_is_raw=data_is_raw,
+        gene_col=gene_col,
+        cell_type_key=cell_type_key,
+    )
 
-    gc.collect()
-    torch.cuda.synchronize()
-    torch.cuda.empty_cache()
+@cli.command("annotate")
+@click.option("--output-dir", required=True, type=click.Path())
+@click.option("--dataset-name", default="LIBD", show_default=True)
+@click.option("--filename", default="LIBD.h5ad", show_default=True)
+@click.option("--embed-filename", default="LIBD_embed.h5ad", show_default=True)
+@click.option("--epochs", default=15, show_default=True, type=int)
+@click.option("--lr", default=2e-4, show_default=True, type=float)
+@click.option("--freeze/--no-freeze", default=False, show_default=True)
+@click.option("--n-unfreeze", default=-1, show_default=True, type=int)
+@click.option("--use-moe/--no-use-moe", default=True, show_default=True)
+# these mirror your main defaults:
+@click.option("--filter-gene-by-counts", default=False, type=bool, show_default=True)
+@click.option("--filter-cell-by-counts", default=False, type=bool, show_default=True)
+@click.option("--data-is-raw", default=True, type=bool, show_default=True)
+@click.option("--gene-col", default="gene_name", show_default=True)
+@click.option("--cell-type-key", default="celltype", show_default=True)
+@click.option("--model-dir", default="../save/scGPT_human", show_default=True)
+@click.option("--faiss-index-dir", default="../save/CellXGene_faiss_index", show_default=True)
+@click.option("--from-json", type=click.Path(exists=True), help="Read args from a JSON list (for sbatch arrays).")
+@click.option("--select", type=int, help="Index into the JSON list (e.g., SLURM_ARRAY_TASK_ID).")
+def annotate_cmd(output_dir, dataset_name, filename, embed_filename, epochs, lr, freeze, n_unfreeze, use_moe,
+                 filter_gene_by_counts, filter_cell_by_counts, data_is_raw, gene_col, cell_type_key,
+                 model_dir, faiss_index_dir, from_json, select):
+    """Fine-tune scGPT for annotation."""
+    # Allow sbatch array selection from JSON
+    if from_json:
+        with open(from_json, "r") as f:
+            grid = json.load(f)
+        idx = int(select) if select is not None else 0
+        params = grid[idx]
+        # override all click options with JSON (so grid drives everything)
+        locals_dict = locals()
+        for k, v in params.items():
+            if k in locals_dict:
+                locals_dict[k] = _maybe_bool(v)
+        output_dir = locals_dict["output_dir"]
+        dataset_name = locals_dict["dataset_name"]
+        filename = locals_dict["filename"]
+        embed_filename = locals_dict["embed_filename"]
+        epochs = int(locals_dict["epochs"])
+        lr = float(locals_dict["lr"])
+        freeze = _maybe_bool(locals_dict["freeze"])
+        n_unfreeze = int(locals_dict["n_unfreeze"])
+        use_moe = _maybe_bool(locals_dict["use_moe"])
+        filter_gene_by_counts = _maybe_bool(locals_dict["filter_gene_by_counts"])
+        filter_cell_by_counts = _maybe_bool(locals_dict["filter_cell_by_counts"])
+        data_is_raw = _maybe_bool(locals_dict["data_is_raw"])
+        gene_col = str(locals_dict["gene_col"])
+        cell_type_key = str(locals_dict["cell_type_key"])
+        model_dir = str(locals_dict["model_dir"])
+        faiss_index_dir = str(locals_dict["faiss_index_dir"])
 
-    annotation(output_dir,
-               dataset_name="LIBD",
-               filename="LIBD.h5ad",
-               embed_dataset=embed_adata,
-               # epochs=15,
-               freeze=False,
-               n_unfreeze=-1,
-               use_moe=False)
+    # load embedded dataset or compute on-the-fly
+    if embed_filename is None:
+        embed_adata = reference_mapping(
+            output_dir=output_dir,
+            model_dir=model_dir,
+            faiss_index_dir=faiss_index_dir,
+            dataset_name=dataset_name,
+            filename=filename,
+            filter_gene_by_counts=filter_gene_by_counts,
+            filter_cell_by_counts=filter_cell_by_counts,
+            data_is_raw=data_is_raw,
+            gene_col=gene_col,
+            cell_type_key=cell_type_key,
+        )
 
-    gc.collect()
-    torch.cuda.synchronize()
-    torch.cuda.empty_cache()
+        annotation(
+            output_dir=output_dir,
+            dataset_name=dataset_name,
+            filename=filename,
+            embed_dataset=embed_adata,
+            epochs=epochs,
+            lr=lr,
+            freeze=freeze,
+            n_unfreeze=n_unfreeze,
+            use_moe=use_moe,
+        )
 
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            freeze=True,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            freeze=False,
-    #            n_unfreeze=-1,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            freeze=False,
-    #            n_unfreeze=2,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            freeze=False,
-    #            n_unfreeze=4,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
+    else:
+        annotation(
+            output_dir=output_dir,
+            dataset_name=dataset_name,
+            filename=filename,
+            embed_filename=embed_filename,
+            epochs=epochs,
+            lr=lr,
+            freeze=freeze,
+            n_unfreeze=n_unfreeze,
+            use_moe=use_moe,
+        )
 
+@cli.command("make-grid")
+@click.argument("subcommand", type=click.Choice(["annotate"]), required=True)
+@click.option("--grid", multiple=True,
+              help="Comma-separated values per key, e.g. --grid epochs=10,20 --grid lr=1e-4,2e-4")
+@click.option("--fixed", multiple=True,
+              help="Fixed key=value pairs applied to every job, e.g. --fixed output_dir=/scratch/... --fixed dataset_name=LIBD")
+@click.option("--out", default="params.json", show_default=True)
+def make_grid(subcommand, grid, fixed, out):
+    """
+    Create a JSON list of parameter dicts for sbatch arrays.
+    Example:
+      python scgpt_finetune.py make-grid annotate \\
+        --grid epochs=10,20 --grid lr=1e-4,2e-4 \\
+        --fixed output_dir=/scratch/... --fixed dataset_name=LIBD \\
+        --fixed filename=LIBD.h5ad --fixed embed_pickle=/scratch/LIBD.embed.pickle
+    """
+    # parse fixed
+    fixed_kv = {}
+    for kv in fixed:
+        k, v = kv.split("=", 1)
+        fixed_kv[k] = v
+    # parse grid
+    grid_kv = []
+    for gv in grid:
+        k, v = gv.split("=", 1)
+        values = [x.strip() for x in v.split(",")]
+        grid_kv.append((k, values))
+    # cartesian product
+    keys = [k for k,_ in grid_kv]
+    vals = [v for _,v in grid_kv]
+    combos = []
+    for prod in itertools.product(*vals):
+        d = dict(zip(keys, prod))
+        d.update(fixed_kv)
+        combos.append(d)
+    with open(out, "w") as f:
+        json.dump(combos, f, indent=2)
+    click.echo(f"Wrote {len(combos)} configurations to {out}")
 
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            freeze=True,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            freeze=False,
-    #            n_unfreeze=-1,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            freeze=False,
-    #            n_unfreeze=2,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            freeze=False,
-    #            n_unfreeze=4,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=1,
-    #            filter_cell_by_counts=False,
-    #            freeze=True,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=1,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=-1,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=1,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=2,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=1,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=4,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-
-
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=1,
-    #            filter_cell_by_counts=False,
-    #            freeze=True,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=1,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=-1,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=1,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=2,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=1,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=4,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=3,
-    #            filter_cell_by_counts=False,
-    #            freeze=True,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=3,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=-1,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=3,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=2,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=3,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=4,
-    #            use_moe=False)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-
-
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=3,
-    #            filter_cell_by_counts=False,
-    #            freeze=True,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=3,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=-1,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=3,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=2,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
-    #
-    # annotation(output_dir,
-    #            dataset_name="LIBD",
-    #            filename="LIBD.h5ad",
-    #            embed_dataset=embed_adata,
-    #            filter_gene_by_counts=3,
-    #            filter_cell_by_counts=False,
-    #            freeze=False,
-    #            n_unfreeze=4,
-    #            use_moe=True)
-    #
-    # gc.collect()
-    # torch.cuda.synchronize()
-    # torch.cuda.empty_cache()
+if __name__ == "__main__":
+    cli()

@@ -9,6 +9,7 @@ dependencies:
   - pytorch=2.5.1
   - pytorch-cuda=12.4
   - cuda-nvcc=12.4
+  - cuda-version=12.4
   - torchtext=0.18.*
   - matplotlib
   - h5py
