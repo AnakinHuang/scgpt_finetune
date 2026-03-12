@@ -5,7 +5,7 @@ Please see our example code in [tutorials/scgpt_finetune.ipynb](tutorials/scgpt_
 ## How to install
 
 ```bash
-module load Anaconda3/2024.02-1 CUDA/12.4 GCC/11
+module load Anaconda3/2024.02-1 CUDA/12.4 GCC/11 git
 
 git clone https://github.com/bowang-lab/scGPT.git
 cd path_to/scGPT
